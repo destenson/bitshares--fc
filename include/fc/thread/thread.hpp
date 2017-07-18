@@ -146,15 +146,15 @@ namespace fc {
       friend void usleep(const microseconds&);
       friend void sleep_until(const time_point&);
       friend void exec();
-      friend int wait_any( std::vector<promise_base::ptr>&& v, const microseconds& );
-      friend int wait_any_until( std::vector<promise_base::ptr>&& v, const time_point& tp );
+      friend size_t wait_any( std::vector<promise_base::ptr>&& v, const microseconds& );
+      friend size_t wait_any_until( std::vector<promise_base::ptr>&& v, const time_point& tp );
       void wait_until( promise_base::ptr && v, const time_point& tp );
       void notify( const promise_base::ptr& v );
 
       void yield(bool reschedule=true);
       void sleep_until( const time_point& t );
       void  exec();
-      int  wait_any_until( std::vector<promise_base::ptr>&& v, const time_point& );
+      size_t  wait_any_until( std::vector<promise_base::ptr>&& v, const time_point& );
 
       void async_task( task_base* t, const priority& p );
       void async_task( task_base* t, const priority& p, const time_point& tp );
@@ -194,8 +194,8 @@ namespace fc {
    int wait_any( const fc::future<T1>& f1, const fc::future<T2>& f2, const microseconds timeout_us = microseconds::maximum()) {
       return fc::thread::current().wait_any(f1,f2,timeout_us);
    }
-   int wait_any( std::vector<promise_base::ptr>&& v, const microseconds& timeout_us = microseconds::maximum() );
-   int wait_any_until( std::vector<promise_base::ptr>&& v, const time_point& tp );
+   size_t wait_any( std::vector<promise_base::ptr>&& v, const microseconds& timeout_us = microseconds::maximum() );
+   size_t wait_any_until( std::vector<promise_base::ptr>&& v, const time_point& tp );
 
    template<typename Functor>
    auto async( Functor&& f, const char* desc FC_TASK_NAME_DEFAULT_ARG, priority prio = priority()) -> fc::future<decltype(f())> {
