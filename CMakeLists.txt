@@ -361,7 +361,6 @@ target_include_directories(fc
     ${Boost_INCLUDE_DIR}
     ${OPENSSL_INCLUDE_DIR}
     "vendor/diff-match-patch-cpp-stl"
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/websocketpp
     "${readline_includes}"
 
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -388,7 +387,8 @@ add_definitions(-DBOOST_TEST_DYN_LINK)
 ENDIF(MSVC)
 ENDIF()
 
-include_directories( vendor/websocketpp )
+#include_directories( vendor/websocketpp )
+find_library(WEBSOCKPP_LIBRARIES NAMES websockpp)
 
 add_subdirectory(tests)
 

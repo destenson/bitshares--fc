@@ -19,9 +19,7 @@
 namespace fc { namespace http {
 
    namespace detail {
-
       struct asio_with_stub_log : public websocketpp::config::asio {
-
           typedef asio_with_stub_log type;
           typedef asio base;
 
@@ -62,11 +60,13 @@ namespace fc { namespace http {
 
           static const long timeout_open_handshake = 0;
       };
-      struct asio_tls_with_stub_log : public websocketpp::config::asio_tls {
 
-          typedef asio_with_stub_log type;
-          typedef asio_tls base;
+#ifdef ENABLE_WEBSOCKET_PERMESSAGE_DEFLATE
+      struct asio_with_stub_log_and_deflate : public websocketpp::config::asio {
+          typedef asio_with_stub_log_and_deflate type;
+          typedef asio base;
 
+          //// All boilerplate copying the base class's config, except as noted
           typedef base::concurrency_type concurrency_type;
 
           typedef base::request_type request_type;
@@ -103,6 +103,8 @@ namespace fc { namespace http {
 
           static const long timeout_open_handshake = 0;
       };
+#endif // ENABLE_WEBSOCKET_PERMESSAGE_DEFLATE
+
       struct asio_tls_stub_log : public websocketpp::config::asio_tls {
          typedef asio_tls_stub_log type;
          typedef asio_tls base;
