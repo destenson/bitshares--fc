@@ -309,13 +309,14 @@ namespace fc
   extern bool enable_record_assert_trip;
 } // namespace fc
 
-#if __APPLE__
+#if __APPLE__ || defined(LINUX)
     #define LIKELY(x)    __builtin_expect((long)!!(x), 1L)
     #define UNLIKELY(x)  __builtin_expect((long)!!(x), 0L)
 #else
     #define LIKELY(x)   (x)
     #define UNLIKELY(x) (x)
 #endif
+
 
 /**
  *@brief: Workaround for varying preprocessing behavior between MSVC and gcc
@@ -373,9 +374,16 @@ namespace fc
     throw; \
   FC_MULTILINE_MACRO_END
 
-#define FC_LOG_AND_RETHROW( )  \
+template <bool Condition> static inline void edumpif(const std::string& s);
+template <> inline void edumpif<true>(const std::string& s) { edump( (s) ); }
+template <> inline void edumpif<false>(const std::string& s) { }
+
+#define FC_LOG_AND_RETHROW() FC_LOG_AND_RETHROW_(false) 
+  
+#define FC_LOG_AND_RETHROW_(dump)  \
    catch( fc::exception& er ) { \
       wlog( "${details}", ("details",er.to_detail_string()) ); \
+      edumpif<dump>(er.to_detail_string()); \
       FC_RETHROW_EXCEPTION( er, warn, "rethrow" ); \
    } catch( const std::exception& e ) {  \
       fc::exception fce( \

@@ -31,6 +31,7 @@ namespace fc { namespace ecc {
         void _init_lib() {
             static const secp256k1_context_t* ctx = _get_context();
             static int init_o = init_openssl();
+            assert(!init_o);
             (void)ctx;
         }
 

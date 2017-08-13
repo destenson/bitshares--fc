@@ -16,6 +16,7 @@ namespace fc { namespace ecc {
     {
         void _init_lib() {
             static int init_o = init_openssl();
+            assert(!init_o);
         }
 
         class private_key_impl

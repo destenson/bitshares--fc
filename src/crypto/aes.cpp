@@ -30,6 +30,7 @@ struct aes_encoder::impl
 aes_encoder::aes_encoder()
 {
   static int init = init_openssl();
+  assert(!init);
 }
 
 aes_encoder::~aes_encoder()
@@ -61,11 +62,11 @@ void aes_encoder::init( const fc::sha256& key, const fc::uint128& init_value )
 
 uint32_t aes_encoder::encode( const char* plaintxt, uint32_t plaintext_len, char* ciphertxt )
 {
-    int ciphertext_len = 0;
+    size_t ciphertext_len = 0;
     /* Provide the message to be encrypted, and obtain the encrypted output.
     *    * EVP_EncryptUpdate can be called multiple times if necessary
     *       */
-    if(1 != EVP_EncryptUpdate(my->ctx, (unsigned char*)ciphertxt, &ciphertext_len, (const unsigned char*)plaintxt, plaintext_len))
+    if(1 != EVP_EncryptUpdate(my->ctx, (unsigned char*)ciphertxt, (int*)&ciphertext_len, (const unsigned char*)plaintxt, plaintext_len))
     {
         FC_THROW_EXCEPTION( aes_exception, "error during aes 256 cbc encryption update", 
                            ("s", ERR_error_string( ERR_get_error(), nullptr) ) );
@@ -98,6 +99,7 @@ struct aes_decoder::impl
 aes_decoder::aes_decoder()
   {
   static int init = init_openssl();
+  assert(!init);
   }
 
 void aes_decoder::init( const fc::sha256& key, const fc::uint128& init_value )
@@ -128,11 +130,11 @@ aes_decoder::~aes_decoder()
 
 uint32_t aes_decoder::decode( const char* ciphertxt, uint32_t ciphertxt_len, char* plaintext )
 {
-    int plaintext_len = 0;
+    size_t plaintext_len = 0;
     /* Provide the message to be decrypted, and obtain the decrypted output.
     *    * EVP_DecryptUpdate can be called multiple times if necessary
     *       */
-	if (1 != EVP_DecryptUpdate(my->ctx, (unsigned char*)plaintext, &plaintext_len, (const unsigned char*)ciphertxt, ciphertxt_len))
+	if (1 != EVP_DecryptUpdate(my->ctx, (unsigned char*)plaintext, (int*)&plaintext_len, (const unsigned char*)ciphertxt, ciphertxt_len))
     {
         FC_THROW_EXCEPTION( aes_exception, "error during aes 256 cbc decryption update", 
                            ("s", ERR_error_string( ERR_get_error(), nullptr) ) );
