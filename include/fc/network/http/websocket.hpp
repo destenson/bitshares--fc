@@ -17,7 +17,7 @@ namespace fc { namespace http {
    class websocket_connection
    {
       public:
-         virtual ~websocket_connection(){}
+         virtual ~websocket_connection() = 0;
          virtual void send_message( const std::string& message ) = 0;
          virtual void close( int64_t code, const std::string& reason  ){};
          void on_message( const std::string& message ) { _on_message(message); }
@@ -29,14 +29,14 @@ namespace fc { namespace http {
          void     set_session_data( fc::any d ){ _session_data = std::move(d); }
          fc::any& get_session_data() { return _session_data; }
 
-         virtual std::string get_request_header(const std::string& key) = 0;
+         virtual std::string get_request_header(const std::string& key);
 
          fc::signal<void()> closed;
       private:
          fc::any                                   _session_data;
          std::function<void(const std::string&)>   _on_message;
          std::function<string(const std::string&)> _on_http;
-   };
+      };
    typedef std::shared_ptr<websocket_connection> websocket_connection_ptr;
 
    typedef std::function<void(const websocket_connection_ptr&)> on_connection_handler;

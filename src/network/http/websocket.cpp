@@ -18,6 +18,9 @@
 
 namespace fc { namespace http {
 
+   std::string  websocket_connection::get_request_header(const std::string& key) = 0;
+    
+
    namespace detail {
       struct asio_with_stub_log : public websocketpp::config::asio {
           typedef asio_with_stub_log type;
