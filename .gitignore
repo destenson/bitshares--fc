@@ -32,15 +32,15 @@ ZERO_CHECK
 *.opensdf
 Debug/
 Release/
+packages/
+obj/
+bin/
 
 CMakeCache.txt
 CMakeFiles
 Makefile
 *.cmake
 *.cbp
-
-libfc.a
-libfc_debug.a
 
 *.sw*
 
