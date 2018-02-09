@@ -8,7 +8,7 @@
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread.hpp>
 #include <boost/atomic.hpp>
-#include <boost/fiber/fiber.hpp>
+//#include <boost/fiber/fiber.hpp>
 #include <vector>
 //#include <fc/logger.hpp>
 
@@ -402,7 +402,7 @@ namespace fc {
                 }
                 // slog( "jump to %p from %p", next, prev );
                 // fc_dlog( logger::get("fc_context"), "from ${from} to ${to}", ( "from", int64_t(prev) )( "to", int64_t(next) ) ); 
-#if BOOST_VERSION >= 105600
+#if BOOST_VERSION >= 106000
 				bc::swap(prev->my_context, next->my_context);
 				//bc::detail::jump_fcontext(prev->my_context, next->my_context);
 #elif BOOST_VERSION >= 105600
@@ -447,7 +447,7 @@ namespace fc {
 
                 // slog( "jump to %p from %p", next, prev );
                 // fc_dlog( logger::get("fc_context"), "from ${from} to ${to}", ( "from", int64_t(prev) )( "to", int64_t(next) ) );
-#if BOOST_VERSION >= 106100
+#if BOOST_VERSION >= 106000
 				bc::swap(prev->my_context, next->my_context);// , (intptr_t)this );
 				//bc::detail::ontop_fcontext(prev->my_context, next->my_context, [&prev,this](bc::detail::transfer_t) {return (bc::detail::transfer_t){ &prev->my_context, this }; });
 #elif BOOST_VERSION >= 105600 //&& BOOST_VERSION < 106300

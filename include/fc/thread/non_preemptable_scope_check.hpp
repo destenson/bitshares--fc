@@ -1,6 +1,9 @@
-#pragma once
+#ifndef FC_SRC_THREAD_NON_PREEMPTABLE_SCOPE_CHECK
+#define FC_SRC_THREAD_NON_PREEMPTABLE_SCOPE_CHECK
 #include <fc/time.hpp>
 #include <fc/thread/spin_yield_lock.hpp>
+
+#pragma once
 
 // This file defines a macro:
 //   ASSERT_TASK_NOT_PREEMPTED()
@@ -32,4 +35,6 @@ namespace fc
   };
 } // namespace fc
 #endif
+
+#endif //#ifndef FC_SRC_THREAD_NON_PREEMPTABLE_SCOPE_CHECK
 

@@ -88,7 +88,8 @@ namespace fc {
     my->_sock.non_blocking(true);
   }
   void udp_socket::set_receive_buffer_size( size_t s ) {
-    my->_sock.set_option(boost::asio::socket_base::receive_buffer_size(s) );
+	  assert(s <= INT_MAX);
+    my->_sock.set_option(boost::asio::socket_base::receive_buffer_size((int)s) );
   }
   void udp_socket::bind( const fc::ip::endpoint& e ) {
     my->_sock.bind( to_asio_ep(e) );

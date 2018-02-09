@@ -469,8 +469,9 @@ string    variant::as_string()const
       case bool_type:
           return *reinterpret_cast<const bool*>(this) ? "true" : "false";
       case blob_type:
-          if( get_blob().data.size() )
-             return base64_encode( get_blob().data.data(), get_blob().data.size() ) + "=";
+		  assert(get_blob().data.size() <= (size_t)UINT32_MAX);
+          if( get_blob().data.size() && (uint32_t)get_blob().data.size() <= UINT32_MAX )
+             return base64_encode( get_blob().data.data(), (uint32_t)get_blob().data.size() ) + "=";
           return string();
       case null_type:
           return string();
@@ -652,8 +653,9 @@ void from_variant( const variant& var,  string& vo )
 
 void to_variant( const std::vector<char>& var,  variant& vo )
 {
-  if( var.size() )
-      vo = variant(to_hex(var.data(),var.size()));
+  assert(var.size() <= UINT32_MAX);
+  if( var.size() && var.size() <= UINT32_MAX )
+      vo = variant(to_hex(var.data(), (uint32_t)var.size()));
   else vo = "";
 }
 void from_variant( const variant& var,  std::vector<char>& vo )

@@ -113,9 +113,9 @@ IF( WIN32 )
   set(Boost_USE_MULTITHREADED ON)
   set(BOOST_ALL_DYN_LINK OFF) # force dynamic linking for all libraries
 
-  FIND_PACKAGE(Boost 1.53 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
+  FIND_PACKAGE(Boost 1.59 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
   # For Boost 1.53 on windows, coroutine was not in BOOST_LIBRARYDIR and do not need it to build,  but if boost versin >= 1.54, find coroutine otherwise will cause link errors
-  IF(NOT "${Boost_VERSION}" MATCHES "1.53(.*)")
+  IF(NOT "${Boost_VERSION}" MATCHES "1.59(.*)")
     SET(BOOST_LIBRARIES_TEMP ${Boost_LIBRARIES})
     FIND_PACKAGE(Boost 1.54 REQUIRED COMPONENTS coroutine)
     LIST(APPEND BOOST_COMPONENTS coroutine)
@@ -246,7 +246,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/git_revision.cpp.in" "${CMAKE_CU
 list(APPEND sources "${CMAKE_CURRENT_BINARY_DIR}/git_revision.cpp")
 list(APPEND sources ${fc_headers})
 
-add_subdirectory( vendor/websocketpp EXCLUDE_FROM_ALL )
+#add_subdirectory( vendor/websocketpp EXCLUDE_FROM_ALL )
+
+find_library(websocketpp ${websocketpp_DIR})
+
+
 
 setup_library( fc SOURCES ${sources} LIBRARY_TYPE STATIC )
 install( DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" DESTINATION include )
@@ -278,11 +282,11 @@ IF(WIN32)
   target_compile_definitions(fc PUBLIC WIN32 NOMINMAX _WIN32_WINNT=0x0501 _CRT_SECURE_NO_WARNINGS
     _SCL_SERCURE_NO_WARNINGS
     # Needed to disable MSVC autolinking feature (#pragma comment)
-    BOOST_ALL_NO_LIB
+    #BOOST_ALL_NO_LIB
     # The current version of websockets doesn't correctly guess what 'chrono' implementation boost::asio uses
     # on the recommended build platform of VC++12/boost_1.58.  Force it here until websocket gets their
     # autodetecting code to do the right thing.
-    _WEBSOCKETPP_CPP11_CHRONO_
+    #_WEBSOCKETPP_CPP11_CHRONO_
   )
   if( MSVC )
     # Activate C++ exception handling, assume extern C calls don't throw
@@ -338,7 +342,7 @@ else()
 endif( BZIP2_FOUND )
 
 # This will become unnecessary once we update to websocketpp which fixes upstream issue #395
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWEBSOCKETPP_STRICT_MASKING")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWEBSOCKETPP_STRICT_MASKING")
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ASIO_HAS_STD_CHRONO")
 
@@ -361,7 +365,7 @@ target_include_directories(fc
     ${Boost_INCLUDE_DIR}
     ${OPENSSL_INCLUDE_DIR}
     "vendor/diff-match-patch-cpp-stl"
-    ${CMAKE_CURRENT_SOURCE_DIR}/vendor/websocketpp
+   # ${CMAKE_CURRENT_SOURCE_DIR}/vendor/websocketpp
     "${readline_includes}"
 
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -388,7 +392,7 @@ add_definitions(-DBOOST_TEST_DYN_LINK)
 ENDIF(MSVC)
 ENDIF()
 
-include_directories( vendor/websocketpp )
+#include_directories( vendor/websocketpp )
 
 add_subdirectory(tests)
 

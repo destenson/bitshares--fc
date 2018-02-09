@@ -43,48 +43,57 @@ namespace fc {
   struct context  {
     typedef fc::context* ptr;
 
-#if BOOST_VERSION >= 105400
+#if BOOST_VERSION >= 106100
+#elif BOOST_VERSION >= 105400
     bco::stack_context stack_ctx;
 #endif
 
 
-    context( void (*sf)(intptr_t), stack_allocator& alloc, fc::thread* t )
-    : caller_context(0),
-      stack_alloc(&alloc),
-      next_blocked(0), 
-      next_blocked_mutex(0), 
-      next(0), 
-      ctx_thread(t),
-      canceled(false),
+	context(void(*sf)(intptr_t), stack_allocator& alloc, fc::thread* t)
+		: caller_context(0),
+		stack_alloc(&alloc),
+		next_blocked(0),
+		next_blocked_mutex(0),
+		next(0),
+		ctx_thread(t),
+		canceled(false),
 #ifndef NDEBUG
-      cancellation_reason(nullptr),
+		cancellation_reason(nullptr),
 #endif
-      complete(false),
-      cur_task(0),
-      context_posted_num(0)
-    {
-#if BOOST_VERSION >= 105600
-     size_t stack_size = FC_CONTEXT_STACK_SIZE;
-     alloc.allocate(stack_ctx, stack_size);
-     my_context = bc::make_fcontext( stack_ctx.sp, stack_ctx.size, sf); 
-#elif BOOST_VERSION >= 105400
-     size_t stack_size = FC_CONTEXT_STACK_SIZE;
-     alloc.allocate(stack_ctx, stack_size);
-     my_context = bc::make_fcontext( stack_ctx.sp, stack_ctx.size, sf);
-#elif BOOST_VERSION >= 105300
-     size_t stack_size = FC_CONTEXT_STACK_SIZE;
-     void*  stackptr = alloc.allocate(stack_size);
-     my_context = bc::make_fcontext( stackptr, stack_size, sf);
+		complete(false),
+		cur_task(0),
+#if BOOST_VERSION >= 106000
+		my_context(FC_CONTEXT_STACK_SIZE),
 #else
-     size_t stack_size = FC_CONTEXT_STACK_SIZE;
-     my_context.fc_stack.base = alloc.allocate( stack_size );
-     my_context.fc_stack.limit = static_cast<char*>( my_context.fc_stack.base) - stack_size;
-     make_fcontext( &my_context, sf );
+		my_context(bc::make_fcontext(stack_ctx.sp, FC_CONTEXT_STACK_SIZE, sf)),
 #endif
-    }
+		context_posted_num(0)
+	{
+#if BOOST_VERSION >= 106000
+#elif BOOST_VERSION >= 105600
+		size_t stack_size = FC_CONTEXT_STACK_SIZE;
+		alloc.allocate(stack_ctx, stack_size);
+		my_context = bc::make_fcontext(stack_ctx.sp, stack_ctx.size, sf);
+#elif BOOST_VERSION >= 105400
+		size_t stack_size = FC_CONTEXT_STACK_SIZE;
+		alloc.allocate(stack_ctx, stack_size);
+		my_context = bc::make_fcontext(stack_ctx.sp, stack_ctx.size, sf);
+#elif BOOST_VERSION >= 105300
+		size_t stack_size = FC_CONTEXT_STACK_SIZE;
+		void*  stackptr = alloc.allocate(stack_size);
+		my_context = bc::make_fcontext(stackptr, stack_size, sf);
+#else
+		size_t stack_size = FC_CONTEXT_STACK_SIZE;
+		my_context.fc_stack.base = alloc.allocate(stack_size);
+		my_context.fc_stack.limit = static_cast<char*>(my_context.fc_stack.base) - stack_size;
+		make_fcontext(&my_context, sf);
+#endif
+	}
 
     context( fc::thread* t) :
-#if BOOST_VERSION >= 105600
+#if BOOST_VERSION >= 106000
+		my_context(FC_CONTEXT_STACK_SIZE),
+#elif BOOST_VERSION >= 105600
      my_context(nullptr),
 #elif BOOST_VERSION >= 105300
      my_context(new bc::fcontext_t),
@@ -101,11 +110,12 @@ namespace fc {
 #endif
      complete(false),
      cur_task(0),
-     context_posted_num(0)
+	context_posted_num(0)
     {}
 
     ~context() {
-#if BOOST_VERSION >= 105600
+#if BOOST_VERSION >= 106100
+#elif BOOST_VERSION >= 105600
       if(stack_alloc)
         stack_alloc->deallocate( stack_ctx );
 #elif BOOST_VERSION >= 105400
@@ -211,6 +221,9 @@ namespace fc {
 
 #if BOOST_VERSION >= 105300 && BOOST_VERSION < 105600
     bc::fcontext_t*              my_context;
+#elif BOOST_VERSION >= 106000
+	bc::execution_context			 my_context;
+	//bc::detail::fcontext_t      my_context;
 #else
     bc::fcontext_t               my_context;
 #endif
@@ -234,5 +247,5 @@ namespace fc {
     uint64_t                     context_posted_num; // serial number set each tiem the context is added to the ready list
   };
 
-} // naemspace fc 
+} // namespace fc 
 

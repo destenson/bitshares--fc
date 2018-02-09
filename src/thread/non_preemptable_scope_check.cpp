@@ -1,4 +1,5 @@
 #ifndef NDEBUG
+#pragma once
 #include <fc/thread/non_preemptable_scope_check.hpp>
 #include <fc/thread/thread.hpp>
 #include "thread_d.hpp"
